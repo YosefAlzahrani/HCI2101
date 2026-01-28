@@ -1,0 +1,1077 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>لعبة إكس-أو الحديثة</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --accent: #3b82f6;
+      --accent-soft: rgba(59, 130, 246, 0.15);
+      --accent-2: #22c55e;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #f97373;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.7);
+      --transition-fast: 0.18s ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1d283a 0, #020617 55%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      gap: 16px;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 960px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.98));
+      border-radius: 28px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shell::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0 0, rgba(59, 130, 246, 0.18), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(34, 197, 94, 0.16), transparent 55%);
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 4px 4px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      background: radial-gradient(circle at 30% 20%, #38bdf8, #3b82f6 40%, #1d4ed8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e5f2ff;
+      font-weight: 800;
+      font-size: 20px;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.6);
+    }
+
+    .logo-text-main {
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      font-size: 18px;
+    }
+
+    .logo-text-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .chip {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 11px;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .chip-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 768px) {
+      .shell {
+        border-radius: 22px;
+        padding: 16px;
+      }
+      .content {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    /* Start screen */
+    .card {
+      background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.18), transparent 55%),
+                  var(--card);
+      border-radius: var(--radius-lg);
+      padding: 18px 16px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(148, 163, 184, 0.12), transparent 40%);
+      mix-blend-mode: soft-light;
+      pointer-events: none;
+    }
+
+    .card-header {
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: var(--muted);
+    }
+
+    .input {
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .input::placeholder {
+      color: #6b7280;
+    }
+
+    .input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.6);
+      background: rgba(15, 23, 42, 0.98);
+      transform: translateY(-1px);
+    }
+
+    .mode-options {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .mode-pill {
+      flex: 1;
+      min-width: 120px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      padding: 7px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      cursor: pointer;
+      background: rgba(15, 23, 42, 0.9);
+      transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .mode-pill span {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .mode-pill small {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .mode-pill-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
+    .mode-pill.active {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(15, 23, 42, 0.96));
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .mode-pill.active .mode-pill-icon {
+      background: var(--accent);
+      border-color: transparent;
+      color: #e5f2ff;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .hint-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent-2);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: none;
+      padding: 9px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), opacity var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #e5f2ff;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.7);
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(37, 99, 235, 0.9);
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--muted);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(15, 23, 42, 1);
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    /* Game area */
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .players-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    .players-info strong {
+      font-size: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--muted);
+    }
+
+    .badge-pill {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .status {
+      font-size: 14px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    .board-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      width: 100%;
+      max-width: 260px;
+      aspect-ratio: 1 / 1;
+    }
+
+    .cell {
+      border-radius: 18px;
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 1));
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--accent);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cell::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(145deg, rgba(148, 163, 184, 0.12), transparent 40%);
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+      pointer-events: none;
+    }
+
+    .cell:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.9);
+      border-color: var(--accent);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 1), rgba(15, 23, 42, 0.96));
+    }
+
+    .cell:hover::after {
+      opacity: 1;
+    }
+
+    .cell.disabled {
+      cursor: default;
+      opacity: 0.7;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .cell.o {
+      color: #facc15;
+    }
+
+    .cell.win {
+      background: radial-gradient(circle at top, rgba(34, 197, 94, 0.25), rgba(15, 23, 42, 1));
+      border-color: #22c55e;
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.7), 0 14px 35px rgba(22, 163, 74, 0.7);
+    }
+
+    .scoreboard {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .score-pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .score-pill span {
+      font-weight: 600;
+    }
+
+    .score-pill.x span {
+      color: var(--accent);
+    }
+
+    .score-pill.o span {
+      color: #facc15;
+    }
+
+    .score-pill.draw span {
+      color: var(--muted);
+    }
+
+    .game-controls {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .alert {
+      margin-top: 8px;
+      font-size: 13px;
+      padding: 7px 10px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--muted);
+    }
+
+    .alert-err {
+      border-color: rgba(248, 113, 113, 0.7);
+      color: #fecaca;
+      background: rgba(127, 29, 29, 0.6);
+    }
+
+    /* Footer */
+    footer {
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .footer-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 10px 16px 14px;
+      border-radius: 18px 18px 0 0;
+      background: rgba(15, 23, 42, 0.96);
+      border-top: 1px solid rgba(148, 163, 184, 0.35);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--muted);
+      backdrop-filter: blur(12px);
+    }
+
+    .footer-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .footer-label {
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .footer-value {
+      font-size: 11px;
+    }
+
+    @media (max-width: 640px) {
+      .footer-inner {
+        border-radius: 18px;
+        justify-content: center;
+        text-align: center;
+      }
+      .footer-item {
+        align-items: center;
+      }
+    }
+
+    /* Utility */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="shell">
+      <header>
+        <div class="logo">
+          <div class="logo-icon">XO</div>
+          <div>
+            <div class="logo-text-main">لعبة إكس-أو التفاعلية</div>
+            <div class="logo-text-sub">وضع لاعب واحد أو لاعبين مع واجهة عصرية</div>
+          </div>
+        </div>
+        <div class="chip">
+          <span class="chip-dot"></span>
+          <span>جاهزة للكمبيوتر والجوال</span>
+        </div>
+      </header>
+
+      <section class="content">
+        <!-- Start Screen -->
+        <section class="card" id="start-screen">
+          <div class="card-header">
+            <div class="card-title">ابدأ اللعب الآن</div>
+            <div class="card-subtitle">اختر وضع اللعب وأدخل أسماء اللاعبين ثم اضغط "ابدأ اللعبة".</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">وضع اللعب</label>
+            <div class="mode-options">
+              <button type="button" class="mode-pill active" data-mode="single">
+                <span>
+                  <strong>لاعب واحد</strong>
+                  <small>ضد الذكاء الاصطناعي</small>
+                </span>
+                <div class="mode-pill-icon">🤖</div>
+              </button>
+              <button type="button" class="mode-pill" data-mode="two">
+                <span>
+                  <strong>لاعبان</strong>
+                  <small>على نفس الجهاز</small>
+                </span>
+                <div class="mode-pill-icon">👥</div>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">اسم اللاعب الأول (X)</label>
+            <input id="player1-input" class="input" type="text" placeholder="مثال: يوسف" />
+          </div>
+
+          <div class="form-group" id="player2-group">
+            <label class="form-label">اسم اللاعب الثاني (O)</label>
+            <input id="player2-input" class="input" type="text" placeholder="مثال: أحمد" />
+          </div>
+
+          <div class="hint">
+            <span class="hint-dot"></span>
+            <span>إذا تركت الاسم فارغًا سيتم استخدام اسم افتراضي تلقائيًا.</span>
+          </div>
+
+          <div id="start-error" class="alert alert-err hidden"></div>
+
+          <div class="btn-row">
+            <button id="start-btn" class="btn btn-primary">
+              <span>ابدأ اللعبة</span>
+              <span>▶</span>
+            </button>
+            <button id="demo-btn" class="btn btn-secondary" type="button">
+              <span>جولة تجريبية سريعة</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Game Screen -->
+        <section class="card" id="game-screen">
+          <div class="game-header">
+            <div class="players-info">
+              <strong id="mode-label">وضع: لاعب واحد</strong>
+              <span id="players-label">X: لاعب 1 · O: لاعب 2</span>
+              <span class="badge">
+                <span class="badge-pill"></span>
+                <span id="turn-label">دور اللاعب X</span>
+              </span>
+            </div>
+            <div class="status">
+              <div class="status-icon">★</div>
+              <span id="status-text">ابدأ جولة جديدة واستمتع!</span>
+            </div>
+          </div>
+
+          <div class="board-wrapper">
+            <div class="board" id="board">
+              <button class="cell" data-index="0"></button>
+              <button class="cell" data-index="1"></button>
+              <button class="cell" data-index="2"></button>
+              <button class="cell" data-index="3"></button>
+              <button class="cell" data-index="4"></button>
+              <button class="cell" data-index="5"></button>
+              <button class="cell" data-index="6"></button>
+              <button class="cell" data-index="7"></button>
+              <button class="cell" data-index="8"></button>
+            </div>
+
+            <div class="scoreboard">
+              <div class="score-pill x">
+                <span>X</span>
+                <span id="score-x">0</span>
+              </div>
+              <div class="score-pill o">
+                <span>O</span>
+                <span id="score-o">0</span>
+              </div>
+              <div class="score-pill draw">
+                <span>تعادل</span>
+                <span id="score-draw">0</span>
+              </div>
+            </div>
+
+            <div class="game-controls">
+              <button id="new-round-btn" class="btn btn-secondary" type="button">جولة جديدة</button>
+              <button id="reset-btn" class="btn btn-secondary" type="button">إعادة تعيين النتائج</button>
+              <button id="back-btn" class="btn btn-secondary" type="button">العودة لصفحة البداية</button>
+            </div>
+
+            <div id="game-message" class="alert hidden"></div>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-item">
+        <span class="footer-label">اسم الطالب</span>
+        <span class="footer-value">YOUSEF SAMI MATAR ALZAHRANI — يوسف سامي مطر الزهراني</span>
+      </div>
+      <div class="footer-item">
+        <span class="footer-label">الرقم الجامعي</span>
+        <span class="footer-value">446001612</span>
+      </div>
+      <div class="footer-item">
+        <span class="footer-label">بإشراف</span>
+        <span class="footer-value">Mohammed Ahmed Jabali</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // عناصر DOM
+    const startScreen = document.getElementById("start-screen");
+    const gameScreen = document.getElementById("game-screen");
+    const modePills = document.querySelectorAll(".mode-pill");
+    const player1Input = document.getElementById("player1-input");
+    const player2Input = document.getElementById("player2-input");
+    const player2Group = document.getElementById("player2-group");
+    const startBtn = document.getElementById("start-btn");
+    const demoBtn = document.getElementById("demo-btn");
+    const startError = document.getElementById("start-error");
+
+    const boardEl = document.getElementById("board");
+    const cells = document.querySelectorAll(".cell");
+    const modeLabel = document.getElementById("mode-label");
+    const playersLabel = document.getElementById("players-label");
+    const turnLabel = document.getElementById("turn-label");
+    const statusText = document.getElementById("status-text");
+    const scoreXEl = document.getElementById("score-x");
+    const scoreOEl = document.getElementById("score-o");
+    const scoreDrawEl = document.getElementById("score-draw");
+    const newRoundBtn = document.getElementById("new-round-btn");
+    const resetBtn = document.getElementById("reset-btn");
+    const backBtn = document.getElementById("back-btn");
+    const gameMessage = document.getElementById("game-message");
+
+    // حالة اللعبة
+    let mode = "single"; // "single" أو "two"
+    let player1Name = "اللاعب 1";
+    let player2Name = "الذكاء الاصطناعي";
+    let board = Array(9).fill(null);
+    let currentPlayer = "X";
+    let isGameOver = false;
+    let scores = { X: 0, O: 0, draw: 0 };
+    let demoInterval = null;
+
+    const winningCombos = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+
+    function setMode(newMode) {
+      mode = newMode;
+      modePills.forEach((pill) => {
+        pill.classList.toggle("active", pill.dataset.mode === newMode);
+      });
+      if (mode === "single") {
+        player2Group.classList.add("hidden");
+      } else {
+        player2Group.classList.remove("hidden");
+      }
+    }
+
+    modePills.forEach((pill) => {
+      pill.addEventListener("click", () => {
+        setMode(pill.dataset.mode);
+      });
+    });
+
+    function showStartError(msg) {
+      startError.textContent = msg;
+      startError.classList.remove("hidden");
+    }
+
+    function clearStartError() {
+      startError.classList.add("hidden");
+      startError.textContent = "";
+    }
+
+    function initGameState() {
+      board = Array(9).fill(null);
+      currentPlayer = "X";
+      isGameOver = false;
+      cells.forEach((cell) => {
+        cell.textContent = "";
+        cell.classList.remove("disabled", "o", "win");
+      });
+      updateTurnLabel();
+      statusText.textContent = "ابدأ جولة جديدة واستمتع!";
+      gameMessage.classList.add("hidden");
+      gameMessage.textContent = "";
+    }
+
+    function updateTurnLabel() {
+      const name = currentPlayer === "X" ? player1Name : player2Name;
+      turnLabel.textContent = `دور ${name} (${currentPlayer})`;
+    }
+
+    function updateScoreboard() {
+      scoreXEl.textContent = scores.X;
+      scoreOEl.textContent = scores.O;
+      scoreDrawEl.textContent = scores.draw;
+    }
+
+    function updatePlayersInfo() {
+      if (mode === "single") {
+        modeLabel.textContent = "وضع: لاعب واحد ضد الذكاء الاصطناعي";
+      } else {
+        modeLabel.textContent = "وضع: لاعبان على نفس الجهاز";
+      }
+      playersLabel.textContent = `X: ${player1Name} · O: ${player2Name}`;
+      updateTurnLabel();
+    }
+
+    function checkWinner() {
+      for (const combo of winningCombos) {
+        const [a, b, c] = combo;
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+          return { winner: board[a], combo };
+        }
+      }
+      if (board.every((cell) => cell !== null)) {
+        return { winner: null, combo: null }; // تعادل
+      }
+      return null;
+    }
+
+    function handleGameEnd(result) {
+      isGameOver = true;
+      if (result.winner) {
+        const winnerSymbol = result.winner;
+        const winnerName = winnerSymbol === "X" ? player1Name : player2Name;
+        scores[winnerSymbol]++;
+        updateScoreboard();
+        statusText.textContent = `فوز ${winnerName}!`;
+        gameMessage.textContent = `تهانينا ${winnerName}! يمكنك بدء جولة جديدة أو إعادة تعيين النتائج.`;
+        gameMessage.classList.remove("hidden");
+        result.combo.forEach((index) => {
+          cells[index].classList.add("win");
+        });
+      } else {
+        scores.draw++;
+        updateScoreboard();
+        statusText.textContent = "تعادل!";
+        gameMessage.textContent = "انتهت الجولة بالتعادل. جرّب مرة أخرى في جولة جديدة.";
+        gameMessage.classList.remove("hidden");
+      }
+      cells.forEach((cell) => cell.classList.add("disabled"));
+    }
+
+    function aiMove() {
+      if (isGameOver) return;
+      const emptyIndices = board
+        .map((val, idx) => (val === null ? idx : null))
+        .filter((idx) => idx !== null);
+
+      if (emptyIndices.length === 0) return;
+
+      // محاولة الفوز أو منع الخسارة (ذكاء بسيط)
+      function findBestMove(symbol) {
+        for (const combo of winningCombos) {
+          const [a, b, c] = combo;
+          const line = [board[a], board[b], board[c]];
+          const countSymbol = line.filter((v) => v === symbol).length;
+          const countEmpty = line.filter((v) => v === null).length;
+          if (countSymbol === 2 && countEmpty === 1) {
+            const emptyIndex = combo[line.indexOf(null)];
+            return emptyIndex;
+          }
+        }
+        return null;
+      }
+
+      // 1) محاولة الفوز
+      let move = findBestMove("O");
+      // 2) منع فوز X
+      if (move === null) move = findBestMove("X");
+      // 3) اختيار عشوائي
+      if (move === null) {
+        move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+      }
+
+      board[move] = "O";
+      const cell = cells[move];
+      cell.textContent = "O";
+      cell.classList.add("o", "disabled");
+
+      const result = checkWinner();
+      if (result) {
+        handleGameEnd(result);
+      } else {
+        currentPlayer = "X";
+        updateTurnLabel();
+        statusText.textContent = "دورك الآن، اختر خانة بحكمة.";
+      }
+    }
+
+    function handleCellClick(e) {
+      const index = parseInt(e.currentTarget.dataset.index, 10);
+      if (isGameOver || board[index] !== null) return;
+
+      if (currentPlayer === "O" && mode === "single") {
+        // في وضع لاعب واحد، لا يسمح بالنقر أثناء دور الذكاء الاصطناعي
+        return;
+      }
+
+      board[index] = currentPlayer;
+      e.currentTarget.textContent = currentPlayer;
+      e.currentTarget.classList.add("disabled");
+      if (currentPlayer === "O") {
+        e.currentTarget.classList.add("o");
+      }
+
+      const result = checkWinner();
+      if (result) {
+        handleGameEnd(result);
+        return;
+      }
+
+      if (mode === "two") {
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+        updateTurnLabel();
+        statusText.textContent = "اللعب مستمر، تابعوا التحدي!";
+      } else {
+        currentPlayer = "O";
+        updateTurnLabel();
+        statusText.textContent = "انتظر حركة الذكاء الاصطناعي...";
+        setTimeout(aiMove, 450);
+      }
+    }
+
+    cells.forEach((cell) => {
+      cell.addEventListener("click", handleCellClick);
+    });
+
+    startBtn.addEventListener("click", () => {
+      clearStartError();
+      clearDemo();
+
+      let p1 = player1Input.value.trim();
+      let p2 = player2Input.value.trim();
+
+      if (!p1) p1 = "اللاعب 1";
+      if (mode === "single") {
+        p2 = "الذكاء الاصطناعي";
+      } else {
+        if (!p2) p2 = "اللاعب 2";
+      }
+
+      player1Name = p1;
+      player2Name = p2;
+
+      startScreen.classList.add("hidden");
+      gameScreen.classList.remove("hidden");
+
+      updatePlayersInfo();
+      initGameState();
+    });
+
+    newRoundBtn.addEventListener("click", () => {
+      clearDemo();
+      initGameState();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      clearDemo();
+      scores = { X: 0, O: 0, draw: 0 };
+      updateScoreboard();
+      initGameState();
+      statusText.textContent = "تمت إعادة تعيين النتائج. ابدأ جولة جديدة.";
+    });
+
+    backBtn.addEventListener("click", () => {
+      clearDemo();
+      startScreen.classList.remove("hidden");
+      gameScreen.classList.add("hidden");
+      clearStartError();
+    });
+
+    function runDemo() {
+      clearDemo();
+      setMode("single");
+      player1Input.value = "ضيف";
+      player2Input.value = "";
+      player1Name = "ضيف";
+      player2Name = "الذكاء الاصطناعي";
+      startScreen.classList.add("hidden");
+      gameScreen.classList.remove("hidden");
+      updatePlayersInfo();
+      initGameState();
+      statusText.textContent = "وضع تجريبي: تتم محاكاة الحركات تلقائيًا.";
+
+      let demoPlayer = "X";
+      demoInterval = setInterval(() => {
+        if (isGameOver) {
+          initGameState();
+          demoPlayer = "X";
+          return;
+        }
+        const emptyIndices = board
+          .map((val, idx) => (val === null ? idx : null))
+          .filter((idx) => idx !== null);
+        if (emptyIndices.length === 0) return;
+        const move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+        board[move] = demoPlayer;
+        const cell = cells[move];
+        cell.textContent = demoPlayer;
+        cell.classList.add("disabled");
+        if (demoPlayer === "O") cell.classList.add("o");
+
+        const result = checkWinner();
+        if (result) {
+          handleGameEnd(result);
+          return;
+        }
+        demoPlayer = demoPlayer === "X" ? "O" : "X";
+        currentPlayer = demoPlayer;
+        updateTurnLabel();
+      }, 600);
+    }
+
+    function clearDemo() {
+      if (demoInterval) {
+        clearInterval(demoInterval);
+        demoInterval = null;
+      }
+    }
+
+    demoBtn.addEventListener("click", runDemo);
+
+    // تهيئة أولية
+    setMode("single");
+    updateScoreboard();
+    initGameState();
+  </script>
+</body>
+</html>
+```
